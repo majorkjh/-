@@ -1,9 +1,11 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
   AlertCircle,
+  AlertTriangle,
   ArrowRight,
   BookOpen,
   Check,
+  CheckCircle2,
   ChevronDown,
   ChevronRight,
   Code2,
@@ -12,6 +14,8 @@ import {
   Download,
   Edit3,
   ExternalLink,
+  Eye,
+  FileCheck,
   FileText,
   FolderOpen,
   History,
@@ -30,6 +34,7 @@ import {
   Trash2,
   Upload,
   X,
+  XCircle,
 } from 'lucide-react';
 import {
   CATEGORIES,
@@ -41,9 +46,10 @@ import {
   LawVersion,
   ReferenceCitation,
   ToastMessage,
+  VerdictType,
 } from './types';
 import { INITIAL_DATA, SAMPLE_QUESTIONS, STORAGE_KEY } from './initialData';
-import { findSimilarCases, generateAnswer } from './aiDraftService';
+import { findSimilarCases, generateAnswer, getQuickVerdict } from './aiDraftService';
 import { extractTextFromPdfFile } from './pdfExtractor';
 import { buildStandaloneHtml } from './standaloneHtmlBuilder';
 import { SourceVerificationModal } from './components/SourceVerificationModal';
@@ -96,13 +102,35 @@ export default function App() {
 
   // ---------------------------------------------------------------------------
   // 2. 탭 1 (질문-답변 작성) 상태
+  //    초기 진입 시에도 정확한 답변을 바로 볼 수 있도록 대표 질문 및 완벽한 법령 답변 로드
   // ---------------------------------------------------------------------------
-  const [question, setQuestion] = useState<string>('');
+  const defaultInitialCase = INITIAL_DATA.cases[0];
+  const [question, setQuestion] = useState<string>(
+    '7급 일반직공무원이 첫째 자녀에 대하여 1년 6개월간 육아휴직을 사용한 경우, 해당 육아휴직 기간 전체가 6급 승진소요최저연수에 산입되는지 궁금합니다.'
+  );
   const [category, setCategory] = useState<CategoryType>('승진');
   const [isGenerating, setIsGenerating] = useState<boolean>(false);
-  const [answerDraft, setAnswerDraft] = useState<string>('');
-  const [referencesDraft, setReferencesDraft] = useState<string>('');
-  const [citationsDraft, setCitationsDraft] = useState<ReferenceCitation[]>([]);
+  const [answerDraft, setAnswerDraft] = useState<string>(
+    defaultInitialCase ? defaultInitialCase.answer : ''
+  );
+  const [referencesDraft, setReferencesDraft] = useState<string>(
+    defaultInitialCase ? defaultInitialCase.references : ''
+  );
+  const [citationsDraft, setCitationsDraft] = useState<ReferenceCitation[]>(
+    defaultInitialCase?.citations || []
+  );
+  const [verdictInfo, setVerdictInfo] = useState<{
+    title: string;
+    type: VerdictType;
+    summary: string;
+  }>({
+    title: '전 기간 산입 인정 (자녀 순위 무관, 최대 3년)',
+    type: 'positive',
+    summary:
+      '개정 「공무원임용령」 제31조제2항제3호에 따라 첫째 자녀를 포함한 모든 자녀의 육아휴직 기간이 최대 3년 범위에서 승진소요최저연수에 전부 산입됩니다.',
+  });
+  const [answerViewMode, setAnswerViewMode] = useState<'card' | 'edit'>('card');
+  const [copyFeedbackText, setCopyFeedbackText] = useState<string | null>(null);
   const [constructedPrompt, setConstructedPrompt] = useState<string>('');
   const [showPromptPreview, setShowPromptPreview] = useState<boolean>(false);
 
@@ -207,24 +235,31 @@ export default function App() {
   }, [data]);
 
   // ---------------------------------------------------------------------------
-  // 6. 핸들러: AI 초안 생성, 피드백, 사례 저장
+  // 6. 핸들러: 실시간 판정, AI 초안 생성, 피드백, 사례 저장, 복사
   // ---------------------------------------------------------------------------
-  const handleGenerateDraft = async () => {
-    const trimmedQuestion = question.trim();
-    if (!trimmedQuestion) {
+  const liveVerdict = useMemo(() => {
+    if (!question.trim()) return null;
+    return getQuickVerdict(question, category, data.laws, data.cases);
+  }, [question, category, data.laws, data.cases]);
+
+  const handleGenerateDraft = async (overrideQ?: string, overrideCat?: CategoryType) => {
+    const qToUse = (overrideQ !== undefined ? overrideQ : question).trim();
+    const catToUse = overrideCat !== undefined ? overrideCat : category;
+
+    if (!qToUse) {
       showToast('질문 내용을 먼저 입력해주세요.', 'error');
       return;
     }
 
     setIsGenerating(true);
 
-    const matchedCases = findSimilarCases(trimmedQuestion, category, data.cases, 3);
+    const matchedCases = findSimilarCases(qToUse, catToUse, data.cases, 3);
     setSimilarCases(matchedCases);
 
     try {
       const result = await generateAnswer(
-        trimmedQuestion,
-        category,
+        qToUse,
+        catToUse,
         data.laws,
         matchedCases
       );
@@ -232,15 +267,55 @@ export default function App() {
       setAnswerDraft(result.answer);
       setReferencesDraft(result.references);
       setCitationsDraft(result.citations);
+      if (result.verdictTitle) {
+        setVerdictInfo({
+          title: result.verdictTitle,
+          type: result.verdictType || 'neutral',
+          summary: result.verdictSummary || '',
+        });
+      }
       if (result.constructedPrompt) {
         setConstructedPrompt(result.constructedPrompt);
       }
-      showToast('최신 법령과 유사 사례를 참조하여 AI 답변 초안이 생성되었습니다.', 'success');
+      setAnswerViewMode('card');
+      showToast('최신 법령과 유사 사례를 참조하여 정확한 답변이 생성되었습니다.', 'success');
     } catch {
-      showToast('AI 초안 생성 중 오류가 발생했습니다.', 'error');
+      showToast('AI 답변 생성 중 오류가 발생했습니다.', 'error');
     } finally {
       setIsGenerating(false);
     }
+  };
+
+  const handleSelectSampleQuestion = async (sq: typeof SAMPLE_QUESTIONS[0]) => {
+    setCategory(sq.category);
+    setQuestion(sq.question);
+    await handleGenerateDraft(sq.question, sq.category);
+  };
+
+  const handleCopyAnswer = () => {
+    if (!answerDraft) return;
+    navigator.clipboard.writeText(answerDraft);
+    setCopyFeedbackText('답변 복사됨');
+    showToast('답변 텍스트가 클립보드에 복사되었습니다.', 'info');
+    setTimeout(() => setCopyFeedbackText(null), 2000);
+  };
+
+  const handleCopyOfficialResponse = () => {
+    if (!answerDraft) return;
+    const formatted = `[인사교육 법령 질의에 대한 공식 회신문]
+- 수신: 민원인 및 관련 부서 담당자
+- 질의 요지: ${question}
+- 분야: [${category}]
+- 근거 법령: ${referencesDraft}
+
+--------------------------------------------------
+${answerDraft}
+--------------------------------------------------
+* 본 회신문은 현행 최신 법령 및 인사혁신처 행정해석을 기반으로 작성되었습니다.`;
+    navigator.clipboard.writeText(formatted);
+    setCopyFeedbackText('공문서식 복사됨');
+    showToast('공문 민원회신문 양식으로 클립보드에 복사되었습니다.', 'info');
+    setTimeout(() => setCopyFeedbackText(null), 2000);
   };
 
   const handleSaveNewCase = () => {
@@ -685,24 +760,24 @@ export default function App() {
 
                 {/* 빠른 질문 샘플 */}
                 <div className="mb-5">
-                  <div className="text-xs font-semibold text-slate-600 mb-2">
-                    자주 묻는 인사교육 질의 예시 (클릭 시 자동 입력)
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-xs font-semibold text-slate-700">
+                      자주 묻는 인사교육 질의 예시 (클릭 시 정확한 답변 즉시 생성·확인)
+                    </span>
+                    <span className="text-[11px] text-purple-700 font-medium">
+                      클릭 즉시 정답 및 근거 조문 자동 대조
+                    </span>
                   </div>
                   <div className="flex flex-wrap gap-1.5">
                     {SAMPLE_QUESTIONS.map((sq) => (
                       <button
                         key={sq.label}
                         type="button"
-                        onClick={() => {
-                          setCategory(sq.category);
-                          setQuestion(sq.question);
-                          setSimilarCases(
-                            findSimilarCases(sq.question, sq.category, data.cases, 3)
-                          );
-                        }}
-                        className="px-2.5 py-1.5 text-xs font-medium text-slate-700 bg-slate-100 hover:bg-purple-50 hover:text-purple-700 rounded-md transition-colors cursor-pointer whitespace-nowrap"
+                        onClick={() => handleSelectSampleQuestion(sq)}
+                        className="px-2.5 py-1.5 text-xs font-medium text-slate-700 bg-slate-100 hover:bg-purple-50 hover:text-purple-700 rounded-md transition-colors cursor-pointer whitespace-nowrap inline-flex items-center gap-1"
                       >
-                        [{sq.category}] {sq.label}
+                        <span className="text-purple-600 font-bold">[{sq.category}]</span>
+                        <span>{sq.label}</span>
                       </button>
                     ))}
                   </div>
@@ -739,12 +814,12 @@ export default function App() {
                   </div>
                 </div>
 
-                <div className="mb-5">
+                <div className="mb-3">
                   <label className="block text-xs font-semibold text-slate-700 mb-1.5">
                     질문 내용
                   </label>
                   <textarea
-                    rows={4}
+                    rows={3}
                     value={question}
                     onChange={(e) => setQuestion(e.target.value)}
                     placeholder="인사교육 관련 질문을 입력하세요"
@@ -752,7 +827,54 @@ export default function App() {
                   />
                 </div>
 
-                <div className="flex flex-wrap items-center justify-between gap-3 pt-2">
+                {/* 질문 입력 시 실시간 법령 판정 요약 바 (Live Quick Verdict) */}
+                {liveVerdict && (
+                  <div
+                    className={`mb-4 p-3 rounded-lg border flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs transition-all ${
+                      liveVerdict.verdictType === 'positive'
+                        ? 'bg-emerald-50/90 border-emerald-300 text-emerald-950'
+                        : liveVerdict.verdictType === 'negative'
+                          ? 'bg-rose-50/90 border-rose-300 text-rose-950'
+                          : liveVerdict.verdictType === 'conditional'
+                            ? 'bg-amber-50/90 border-amber-300 text-amber-950'
+                            : 'bg-purple-50/90 border-purple-200 text-purple-950'
+                    }`}
+                  >
+                    <div className="flex items-start gap-2.5">
+                      {liveVerdict.verdictType === 'positive' ? (
+                        <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+                      ) : liveVerdict.verdictType === 'negative' ? (
+                        <XCircle className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
+                      ) : liveVerdict.verdictType === 'conditional' ? (
+                        <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+                      ) : (
+                        <Sparkles className="w-4 h-4 text-purple-600 shrink-0 mt-0.5" />
+                      )}
+                      <div>
+                        <div className="font-bold text-slate-900 flex items-center gap-1.5 mb-0.5">
+                          <span className="text-[11px] text-purple-700 bg-white/80 px-1.5 py-0.2 rounded border border-purple-200">
+                            실시간 법령 판정
+                          </span>
+                          <span className="text-sm font-bold">{liveVerdict.verdictTitle}</span>
+                        </div>
+                        <p className="text-slate-700 leading-relaxed font-normal">
+                          {liveVerdict.verdictSummary}
+                        </p>
+                      </div>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => handleGenerateDraft()}
+                      disabled={isGenerating}
+                      className="shrink-0 px-3 py-1.5 text-xs font-bold text-white bg-purple-600 hover:bg-purple-700 rounded-md transition-colors cursor-pointer inline-flex items-center gap-1 shadow-2xs whitespace-nowrap"
+                    >
+                      <span>공문 답변 생성</span>
+                      <ArrowRight className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                )}
+
+                <div className="flex flex-wrap items-center justify-between gap-3 pt-1">
                   <button
                     type="button"
                     onClick={() => {
@@ -770,8 +892,8 @@ export default function App() {
                   <button
                     type="button"
                     disabled={isGenerating}
-                    onClick={handleGenerateDraft}
-                    className="px-5 py-2.5 text-sm font-bold text-white bg-purple-600 hover:bg-purple-700 disabled:bg-purple-400 rounded-md transition-colors inline-flex items-center gap-2 cursor-pointer"
+                    onClick={() => handleGenerateDraft()}
+                    className="px-5 py-2.5 text-sm font-bold text-white bg-purple-600 hover:bg-purple-700 disabled:bg-purple-400 rounded-md transition-colors inline-flex items-center gap-2 cursor-pointer shadow-sm"
                   >
                     {isGenerating ? (
                       <>
@@ -788,19 +910,50 @@ export default function App() {
                 </div>
               </section>
 
-              {/* AI 답변 표시 및 편집 영역 */}
-              <section className="bg-white border border-slate-200 rounded-lg p-6">
+              {/* AI 답변 표시 및 편집 영역 (정확한 답변 바로보기 카드 중심 구성) */}
+              <section className="bg-white border border-slate-200 rounded-lg p-6 shadow-2xs">
                 <div className="flex flex-wrap items-center justify-between gap-2 pb-4 mb-5 border-b border-slate-100">
                   <div>
-                    <h2 className="text-base font-bold text-slate-900">
-                      AI 답변 초안 및 근거 조문 검증
-                    </h2>
+                    <div className="flex items-center gap-2">
+                      <span className="w-2 h-2 rounded-full bg-purple-600"></span>
+                      <h2 className="text-base font-bold text-slate-900">
+                        정확한 법령 검토 답변 (Official Legal Answer)
+                      </h2>
+                    </div>
                     <p className="text-xs text-slate-500 mt-0.5">
-                      참고 법령 조문의 [원문 검증하기]를 클릭하여 법령 원문과 하이라이트 문구를 즉시 확인할 수 있습니다.
+                      인사혁신처·법제처 최신 법령 근거 조문과 공식 행정해석을 바탕으로 작성된 답변입니다.
                     </p>
                   </div>
 
                   <div className="flex items-center gap-2">
+                    {/* 뷰 모드 토글: 정답 열람 뷰 vs 직접 편집 뷰 */}
+                    <div className="inline-flex rounded-md border border-slate-200 p-0.5 bg-slate-50">
+                      <button
+                        type="button"
+                        onClick={() => setAnswerViewMode('card')}
+                        className={`px-3 py-1 text-xs font-bold rounded cursor-pointer transition-colors inline-flex items-center gap-1 ${
+                          answerViewMode === 'card'
+                            ? 'bg-white text-purple-700 shadow-2xs'
+                            : 'text-slate-600 hover:text-slate-900'
+                        }`}
+                      >
+                        <Eye className="w-3.5 h-3.5" />
+                        정답 열람 뷰
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setAnswerViewMode('edit')}
+                        className={`px-3 py-1 text-xs font-bold rounded cursor-pointer transition-colors inline-flex items-center gap-1 ${
+                          answerViewMode === 'edit'
+                            ? 'bg-white text-purple-700 shadow-2xs'
+                            : 'text-slate-600 hover:text-slate-900'
+                        }`}
+                      >
+                        <Edit3 className="w-3.5 h-3.5" />
+                        답변 수정·편집
+                      </button>
+                    </div>
+
                     {answerDraft && (
                       <button
                         type="button"
@@ -813,7 +966,7 @@ export default function App() {
                         className="px-3 py-1.5 text-xs font-semibold text-purple-700 bg-purple-50 hover:bg-purple-100 rounded-md inline-flex items-center gap-1.5 transition-colors cursor-pointer"
                       >
                         <Star className="w-3.5 h-3.5 fill-purple-600 text-purple-600" />
-                        답변 정확도 평가·피드백
+                        평가·피드백
                       </button>
                     )}
                   </div>
@@ -826,24 +979,156 @@ export default function App() {
                       최신 개정 법령 조문과 유사 업무 사례를 대조 분석 중입니다...
                     </p>
                     <p className="text-xs text-slate-500 mt-1">
-                      공무원임용령, 복무규정 등의 최신 버전을 기반으로 답변을 생성합니다.
+                      공무원임용령, 복무규정 등의 최신 버전을 기반으로 명확한 판단과 조문을 추출합니다.
                     </p>
+                  </div>
+                ) : !answerDraft ? (
+                  /* 답변 미생성 시 안내 카드 */
+                  <div className="py-12 px-6 flex flex-col items-center justify-center text-center bg-slate-50/70 border border-dashed border-slate-200 rounded-lg">
+                    <div className="w-12 h-12 rounded-full bg-purple-100 flex items-center justify-center text-purple-600 mb-3">
+                      <Sparkles className="w-6 h-6" />
+                    </div>
+                    <h3 className="text-sm font-bold text-slate-900 mb-1">
+                      궁금한 인사교육 질문을 입력하거나 상단 예시를 선택하세요
+                    </h3>
+                    <p className="text-xs text-slate-500 max-w-md mb-4">
+                      국가공무원법, 공무원임용령, 복무규정 등 최신 법령에 기반하여 명확한 가/부 판정 및 근거 조문을 바로 확인하실 수 있습니다.
+                    </p>
+                    <button
+                      type="button"
+                      onClick={() => handleSelectSampleQuestion(SAMPLE_QUESTIONS[0])}
+                      className="px-4 py-2 text-xs font-bold text-white bg-purple-600 hover:bg-purple-700 rounded-md transition-colors cursor-pointer inline-flex items-center gap-1.5"
+                    >
+                      <Sparkles className="w-3.5 h-3.5" />
+                      대표 질문으로 정확한 답변 바로 확인하기
+                    </button>
                   </div>
                 ) : (
                   <>
-                    {/* 답변 본문 textarea */}
-                    <div className="mb-5">
-                      <label className="block text-xs font-semibold text-slate-700 mb-1.5">
-                        AI 답변 초안 (편집 가능)
-                      </label>
-                      <textarea
-                        rows={11}
-                        value={answerDraft}
-                        onChange={(e) => setAnswerDraft(e.target.value)}
-                        placeholder="상단의 [AI 초안 생성]을 클릭하면 최신 법령 조항을 인용한 답변 초안이 생성됩니다."
-                        className="w-full p-4 text-sm bg-white border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-600 leading-relaxed"
-                      />
-                    </div>
+                    {/* ========================================================
+                        정답 열람 뷰 (Card Mode)
+                        ======================================================== */}
+                    {answerViewMode === 'card' ? (
+                      <div className="space-y-4 mb-5">
+                        {/* 1. 핵심 판단 결과 배너 (Verdict Banner) */}
+                        <div
+                          className={`p-4 rounded-lg border ${
+                            verdictInfo.type === 'positive'
+                              ? 'bg-emerald-50/80 border-emerald-200'
+                              : verdictInfo.type === 'negative'
+                                ? 'bg-rose-50/80 border-rose-200'
+                                : verdictInfo.type === 'conditional'
+                                  ? 'bg-amber-50/80 border-amber-200'
+                                  : 'bg-purple-50/80 border-purple-200'
+                          }`}
+                        >
+                          <div className="flex items-center gap-2 mb-1.5">
+                            <span
+                              className={`text-[11px] font-bold px-2 py-0.5 rounded font-mono ${
+                                verdictInfo.type === 'positive'
+                                  ? 'bg-emerald-600 text-white'
+                                  : verdictInfo.type === 'negative'
+                                    ? 'bg-rose-600 text-white'
+                                    : verdictInfo.type === 'conditional'
+                                      ? 'bg-amber-600 text-white'
+                                      : 'bg-purple-600 text-white'
+                              }`}
+                            >
+                              핵심 결론
+                            </span>
+                            <h3 className="text-base font-bold text-slate-900">
+                              {verdictInfo.title}
+                            </h3>
+                          </div>
+                          <p className="text-xs text-slate-700 leading-relaxed font-medium">
+                            {verdictInfo.summary}
+                          </p>
+                        </div>
+
+                        {/* 2. 체계적인 3단계 법령 공식 답변 전문 카드 */}
+                        <div className="bg-slate-50 border border-slate-200 rounded-lg p-5 text-sm leading-relaxed space-y-4">
+                          <div className="whitespace-pre-wrap text-slate-800 font-sans text-xs sm:text-sm">
+                            {answerDraft}
+                          </div>
+                        </div>
+
+                        {/* 원클릭 복사 및 빠른 편집 액션 바 */}
+                        <div className="flex flex-wrap items-center justify-between gap-2 p-3 bg-slate-100/70 border border-slate-200 rounded-md text-xs">
+                          <span className="text-slate-600 font-medium">
+                            민원 회신문이나 기안 결재 문서에 바로 활용할 수 있습니다.
+                          </span>
+                          <div className="flex items-center gap-2">
+                            <button
+                              type="button"
+                              onClick={handleCopyAnswer}
+                              className="px-3 py-1.5 font-bold text-slate-700 bg-white border border-slate-300 hover:bg-slate-50 rounded inline-flex items-center gap-1.5 cursor-pointer shadow-2xs"
+                            >
+                              {copyFeedbackText === '답변 복사됨' ? (
+                                <Check className="w-3.5 h-3.5 text-emerald-600" />
+                              ) : (
+                                <Copy className="w-3.5 h-3.5" />
+                              )}
+                              <span>{copyFeedbackText === '답변 복사됨' ? '복사 완료!' : '답변 복사'}</span>
+                            </button>
+
+                            <button
+                              type="button"
+                              onClick={handleCopyOfficialResponse}
+                              className="px-3 py-1.5 font-bold text-purple-700 bg-white border border-purple-200 hover:bg-purple-50 rounded inline-flex items-center gap-1.5 cursor-pointer shadow-2xs"
+                            >
+                              {copyFeedbackText === '공문서식 복사됨' ? (
+                                <Check className="w-3.5 h-3.5 text-emerald-600" />
+                              ) : (
+                                <FileCheck className="w-3.5 h-3.5" />
+                              )}
+                              <span>
+                                {copyFeedbackText === '공문서식 복사됨' ? '공문 서식 복사됨!' : '공문 회신문 양식 복사'}
+                              </span>
+                            </button>
+
+                            <button
+                              type="button"
+                              onClick={() => setAnswerViewMode('edit')}
+                              className="px-3 py-1.5 font-bold text-slate-600 hover:text-slate-900 rounded inline-flex items-center gap-1 cursor-pointer"
+                            >
+                              <Edit3 className="w-3.5 h-3.5" />
+                              직접 편집하기
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    ) : (
+                      /* ========================================================
+                          직접 편집 뷰 (Edit Mode)
+                          ======================================================== */
+                      <div className="mb-5 space-y-2">
+                        <div className="flex items-center justify-between text-xs">
+                          <label className="font-semibold text-slate-700">
+                            AI 답변 초안 (직접 수정·보완)
+                          </label>
+                          <span className="text-slate-500">
+                            수정하신 내용은 [사례 저장] 시 그대로 보존됩니다.
+                          </span>
+                        </div>
+                        <textarea
+                          rows={11}
+                          value={answerDraft}
+                          onChange={(e) => setAnswerDraft(e.target.value)}
+                          placeholder="답변 내용을 수정하거나 보완하세요."
+                          className="w-full p-4 text-sm bg-white border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-600 leading-relaxed font-sans"
+                        />
+                        <div className="flex justify-end pt-1">
+                          <button
+                            type="button"
+                            onClick={() => setAnswerViewMode('card')}
+                            className="px-3 py-1.5 text-xs font-bold text-purple-700 bg-purple-50 hover:bg-purple-100 rounded inline-flex items-center gap-1 cursor-pointer"
+                          >
+                            <Eye className="w-3.5 h-3.5" />
+                            열람 뷰로 확인
+                          </button>
+                        </div>
+                      </div>
+                    )}
 
                     {/* 향상된 참고 법령 조문 영역 (직접 링크 및 하이라이트 검증) */}
                     <div className="p-4 bg-slate-50 border border-slate-200 rounded-md mb-5">
@@ -1009,13 +1294,23 @@ export default function App() {
                           <button
                             type="button"
                             onClick={() => {
+                              setQuestion(item.question);
+                              setCategory(item.category);
                               setAnswerDraft(item.answer);
                               setReferencesDraft(item.references);
-                              showToast('유사 사례 답변을 편집창에 불러왔습니다.', 'info');
+                              setCitationsDraft(item.citations || []);
+                              const quick = getQuickVerdict(item.question, item.category, data.laws, data.cases);
+                              setVerdictInfo({
+                                title: quick.verdictTitle,
+                                type: quick.verdictType,
+                                summary: quick.verdictSummary,
+                              });
+                              setAnswerViewMode('card');
+                              showToast(`'${item.category}' 유사 사례 정확한 답변을 불러왔습니다.`, 'success');
                             }}
                             className="text-xs font-semibold text-purple-600 hover:text-purple-800 cursor-pointer"
                           >
-                            답변란에 적용
+                            답변란에 즉시 적용
                           </button>
                         </div>
                       </div>

@@ -99,11 +99,16 @@ export interface DataSchema {
   };
 }
 
+export type VerdictType = 'positive' | 'negative' | 'conditional' | 'neutral';
+
 export interface GenerateAnswerResult {
   answer: string;
   references: string;
   citations: ReferenceCitation[];
   constructedPrompt?: string;
+  verdictTitle?: string;
+  verdictType?: VerdictType;
+  verdictSummary?: string;
 }
 
 export interface ToastMessage {
