@@ -1,0 +1,8 @@
+{
+  "name": "인사교육 법령 Q&A 도우미",
+  "description": "법령 데이터를 기반으로 공무원 인사교육 질문에 대한 답변 초안 생성 및 업무 사례를 관리합니다.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
