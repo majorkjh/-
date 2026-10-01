@@ -24,8 +24,8 @@ export function buildStandaloneHtml(currentData: DataSchema): string {
   </script>
   <style>
     :root {
-      --primary: #2563eb;
-      --primary-hover: #1d4ed8;
+      --primary: #9333ea;
+      --primary-hover: #7e22ce;
       --bg: #f8fafc;
       --card: #ffffff;
       --border: #e2e8f0;

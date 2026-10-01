@@ -17,6 +17,11 @@
     font-family: var(--font-mono);
     font-variant-numeric: tabular-nums;
   }
+
+  ::selection {
+    background-color: #f3e8ff;
+    color: #581c87;
+  }
 }
 
 .tabular-nums {

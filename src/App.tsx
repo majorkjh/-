@@ -555,7 +555,7 @@ export default function App() {
                 ? 'bg-red-950 text-white border-red-800'
                 : t.type === 'info'
                   ? 'bg-slate-900 text-white border-slate-700'
-                  : 'bg-blue-950 text-white border-blue-800'
+                  : 'bg-purple-950 text-white border-purple-800'
             }`}
           >
             <span>{t.message}</span>
@@ -594,7 +594,7 @@ export default function App() {
               onClick={() => setActiveTab('qna')}
               className={`h-full inline-flex items-center border-b-2 text-sm font-semibold whitespace-nowrap shrink-0 transition-colors cursor-pointer ${
                 activeTab === 'qna'
-                  ? 'border-blue-600 text-blue-600'
+                  ? 'border-purple-600 text-purple-600'
                   : 'border-transparent text-slate-600 hover:text-slate-900'
               }`}
             >
@@ -605,7 +605,7 @@ export default function App() {
               onClick={() => setActiveTab('cases')}
               className={`h-full inline-flex items-center border-b-2 text-sm font-semibold whitespace-nowrap shrink-0 transition-colors cursor-pointer ${
                 activeTab === 'cases'
-                  ? 'border-blue-600 text-blue-600'
+                  ? 'border-purple-600 text-purple-600'
                   : 'border-transparent text-slate-600 hover:text-slate-900'
               }`}
             >
@@ -616,7 +616,7 @@ export default function App() {
               onClick={() => setActiveTab('laws')}
               className={`h-full inline-flex items-center border-b-2 text-sm font-semibold whitespace-nowrap shrink-0 transition-colors cursor-pointer ${
                 activeTab === 'laws'
-                  ? 'border-blue-600 text-blue-600'
+                  ? 'border-purple-600 text-purple-600'
                   : 'border-transparent text-slate-600 hover:text-slate-900'
               }`}
             >
@@ -700,7 +700,7 @@ export default function App() {
                             findSimilarCases(sq.question, sq.category, data.cases, 3)
                           );
                         }}
-                        className="px-2.5 py-1.5 text-xs font-medium text-slate-700 bg-slate-100 hover:bg-blue-50 hover:text-blue-700 rounded-md transition-colors cursor-pointer whitespace-nowrap"
+                        className="px-2.5 py-1.5 text-xs font-medium text-slate-700 bg-slate-100 hover:bg-purple-50 hover:text-purple-700 rounded-md transition-colors cursor-pointer whitespace-nowrap"
                       >
                         [{sq.category}] {sq.label}
                       </button>
@@ -723,7 +723,7 @@ export default function App() {
                           findSimilarCases(question, nextCat, data.cases, 3)
                         );
                       }}
-                      className="w-full h-10 px-3 text-sm bg-white border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-600"
+                      className="w-full h-10 px-3 text-sm bg-white border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-600"
                     >
                       {CATEGORIES.map((cat) => (
                         <option key={cat} value={cat}>
@@ -748,7 +748,7 @@ export default function App() {
                     value={question}
                     onChange={(e) => setQuestion(e.target.value)}
                     placeholder="인사교육 관련 질문을 입력하세요"
-                    className="w-full p-3.5 text-sm bg-white border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-600 leading-relaxed"
+                    className="w-full p-3.5 text-sm bg-white border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-600 leading-relaxed"
                   />
                 </div>
 
@@ -771,7 +771,7 @@ export default function App() {
                     type="button"
                     disabled={isGenerating}
                     onClick={handleGenerateDraft}
-                    className="px-5 py-2.5 text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 rounded-md transition-colors inline-flex items-center gap-2 cursor-pointer"
+                    className="px-5 py-2.5 text-sm font-bold text-white bg-purple-600 hover:bg-purple-700 disabled:bg-purple-400 rounded-md transition-colors inline-flex items-center gap-2 cursor-pointer"
                   >
                     {isGenerating ? (
                       <>
@@ -810,9 +810,9 @@ export default function App() {
                             caseId: activeCaseId || undefined,
                           })
                         }
-                        className="px-3 py-1.5 text-xs font-semibold text-blue-700 bg-blue-50 hover:bg-blue-100 rounded-md inline-flex items-center gap-1.5 transition-colors cursor-pointer"
+                        className="px-3 py-1.5 text-xs font-semibold text-purple-700 bg-purple-50 hover:bg-purple-100 rounded-md inline-flex items-center gap-1.5 transition-colors cursor-pointer"
                       >
-                        <Star className="w-3.5 h-3.5 fill-blue-600 text-blue-600" />
+                        <Star className="w-3.5 h-3.5 fill-purple-600 text-purple-600" />
                         답변 정확도 평가·피드백
                       </button>
                     )}
@@ -821,7 +821,7 @@ export default function App() {
 
                 {isGenerating ? (
                   <div className="py-14 flex flex-col items-center justify-center text-center">
-                    <Loader2 className="w-8 h-8 text-blue-600 animate-spin mb-3" />
+                    <Loader2 className="w-8 h-8 text-purple-600 animate-spin mb-3" />
                     <p className="text-sm font-semibold text-slate-800">
                       최신 개정 법령 조문과 유사 업무 사례를 대조 분석 중입니다...
                     </p>
@@ -841,7 +841,7 @@ export default function App() {
                         value={answerDraft}
                         onChange={(e) => setAnswerDraft(e.target.value)}
                         placeholder="상단의 [AI 초안 생성]을 클릭하면 최신 법령 조항을 인용한 답변 초안이 생성됩니다."
-                        className="w-full p-4 text-sm bg-white border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-600 leading-relaxed"
+                        className="w-full p-4 text-sm bg-white border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-600 leading-relaxed"
                       />
                     </div>
 
@@ -849,7 +849,7 @@ export default function App() {
                     <div className="p-4 bg-slate-50 border border-slate-200 rounded-md mb-5">
                       <div className="flex items-center justify-between mb-2.5">
                         <label className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
-                          <BookOpen className="w-3.5 h-3.5 text-blue-600" />
+                          <BookOpen className="w-3.5 h-3.5 text-purple-600" />
                           참고 법령 조문 (원문 링크 및 하이라이트 대조)
                         </label>
                         <span className="text-[11px] text-slate-500">
@@ -863,7 +863,7 @@ export default function App() {
                           {citationsDraft.map((cit) => (
                             <div
                               key={cit.id}
-                              className="p-3 bg-white border border-slate-200 rounded-md shadow-2xs hover:border-blue-400 transition-colors flex flex-col justify-between"
+                              className="p-3 bg-white border border-slate-200 rounded-md shadow-2xs hover:border-purple-400 transition-colors flex flex-col justify-between"
                             >
                               <div>
                                 <div className="flex items-center justify-between text-xs font-bold text-slate-900 mb-1">
@@ -880,7 +880,7 @@ export default function App() {
                                 <button
                                   type="button"
                                   onClick={() => setSelectedCitationForVerify(cit)}
-                                  className="text-xs font-bold text-blue-600 hover:text-blue-800 inline-flex items-center gap-1 cursor-pointer"
+                                  className="text-xs font-bold text-purple-600 hover:text-purple-800 inline-flex items-center gap-1 cursor-pointer"
                                 >
                                   법령 원문 검증하기
                                   <ArrowRight className="w-3.5 h-3.5" />
@@ -896,7 +896,7 @@ export default function App() {
                         value={referencesDraft}
                         onChange={(e) => setReferencesDraft(e.target.value)}
                         placeholder="근거 조문(예: 공무원임용령 제31조제2항제3호)이 여기에 표시됩니다."
-                        className="w-full p-2.5 text-xs bg-white border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-600"
+                        className="w-full p-2.5 text-xs bg-white border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-600"
                       />
                     </div>
 
@@ -906,7 +906,7 @@ export default function App() {
                         <button
                           type="button"
                           onClick={() => setShowPromptPreview((prev) => !prev)}
-                          className="text-xs font-semibold text-slate-600 hover:text-blue-600 inline-flex items-center gap-1 cursor-pointer"
+                          className="text-xs font-semibold text-slate-600 hover:text-purple-600 inline-flex items-center gap-1 cursor-pointer"
                         >
                           {showPromptPreview ? (
                             <ChevronDown className="w-4 h-4" />
@@ -947,7 +947,7 @@ export default function App() {
                         <button
                           type="button"
                           onClick={handleSaveNewCase}
-                          className="px-5 py-2 text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 rounded-md inline-flex items-center gap-1.5 cursor-pointer"
+                          className="px-5 py-2 text-sm font-bold text-white bg-purple-600 hover:bg-purple-700 rounded-md inline-flex items-center gap-1.5 cursor-pointer"
                         >
                           <Check className="w-4 h-4" />
                           사례 저장
@@ -973,7 +973,7 @@ export default function App() {
                 <button
                   type="button"
                   onClick={() => setIsSimilarPanelOpenMobile((prev) => !prev)}
-                  className="lg:hidden text-xs font-semibold text-blue-600 cursor-pointer"
+                  className="lg:hidden text-xs font-semibold text-purple-600 cursor-pointer"
                 >
                   {isSimilarPanelOpenMobile ? '접기' : '펼치기'}
                 </button>
@@ -989,7 +989,7 @@ export default function App() {
                     similarCases.map((item, idx) => (
                       <div key={item.id} className="py-4 first:pt-0 last:pb-0">
                         <div className="flex items-center justify-between text-xs text-slate-500 mb-1">
-                          <span className="font-semibold text-blue-700">
+                          <span className="font-semibold text-purple-700">
                             {item.category}
                           </span>
                           <span className="font-mono tabular-nums">
@@ -1013,7 +1013,7 @@ export default function App() {
                               setReferencesDraft(item.references);
                               showToast('유사 사례 답변을 편집창에 불러왔습니다.', 'info');
                             }}
-                            className="text-xs font-semibold text-blue-600 hover:text-blue-800 cursor-pointer"
+                            className="text-xs font-semibold text-purple-600 hover:text-purple-800 cursor-pointer"
                           >
                             답변란에 적용
                           </button>
@@ -1092,7 +1092,7 @@ export default function App() {
                       setAppliedCategory(e.target.value);
                       setCurrentPage(1);
                     }}
-                    className="w-full h-10 px-3 text-sm bg-white border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-600"
+                    className="w-full h-10 px-3 text-sm bg-white border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-600"
                   >
                     <option value="전체">전체</option>
                     {CATEGORIES.map((cat) => (
@@ -1113,7 +1113,7 @@ export default function App() {
                       value={searchKeywordInput}
                       onChange={(e) => setSearchKeywordInput(e.target.value)}
                       placeholder="질문, 답변 본문, 근거 법령 조문 키워드로 검색"
-                      className="w-full h-10 pl-9 pr-3 text-sm bg-white border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-600"
+                      className="w-full h-10 pl-9 pr-3 text-sm bg-white border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-600"
                     />
                     <Search className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
                   </div>
@@ -1122,7 +1122,7 @@ export default function App() {
                 <div className="sm:col-span-3 flex items-center gap-2">
                   <button
                     type="submit"
-                    className="flex-1 h-10 px-4 text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 rounded-md transition-colors cursor-pointer"
+                    className="flex-1 h-10 px-4 text-sm font-bold text-white bg-purple-600 hover:bg-purple-700 rounded-md transition-colors cursor-pointer"
                   >
                     검색
                   </button>
@@ -1187,7 +1187,7 @@ export default function App() {
                                   setEditingCaseId(null);
                                 }}
                                 className={`cursor-pointer transition-colors ${
-                                  isSelected ? 'bg-blue-50/70' : 'hover:bg-slate-50'
+                                  isSelected ? 'bg-purple-50/70' : 'hover:bg-slate-50'
                                 }`}
                               >
                                 <td className="py-3.5 px-4 font-mono tabular-nums text-xs text-slate-500">
@@ -1243,7 +1243,7 @@ export default function App() {
                               onClick={() => setCurrentPage(p)}
                               className={`px-2.5 py-1 rounded font-mono tabular-nums cursor-pointer ${
                                 p === currentPage
-                                  ? 'bg-blue-600 text-white font-semibold'
+                                  ? 'bg-purple-600 text-white font-semibold'
                                   : 'text-slate-600 hover:bg-slate-100'
                               }`}
                             >
@@ -1345,7 +1345,7 @@ export default function App() {
                           setEditingCaseId(null);
                           showToast('사례가 수정되었습니다.', 'success');
                         }}
-                        className="px-4 py-1.5 text-xs font-bold text-white bg-blue-600 rounded-md cursor-pointer"
+                        className="px-4 py-1.5 text-xs font-bold text-white bg-purple-600 rounded-md cursor-pointer"
                       >
                         수정 완료
                       </button>
@@ -1356,7 +1356,7 @@ export default function App() {
                   <div className="space-y-4">
                     <div className="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-slate-100">
                       <div className="text-xs text-slate-500">
-                        <span className="font-bold text-blue-700">
+                        <span className="font-bold text-purple-700">
                           {selectedCaseDetail.category}
                         </span>
                         <span className="mx-1.5">·</span>
@@ -1431,7 +1431,7 @@ export default function App() {
                               <button
                                 type="button"
                                 onClick={() => setSelectedCitationForVerify(cit)}
-                                className="text-blue-600 hover:text-blue-800 font-bold inline-flex items-center gap-1 cursor-pointer"
+                                className="text-purple-600 hover:text-purple-800 font-bold inline-flex items-center gap-1 cursor-pointer"
                               >
                                 원문 검증
                                 <ArrowRight className="w-3 h-3" />
@@ -1457,7 +1457,7 @@ export default function App() {
                               existingFeedback: selectedCaseDetail.feedback,
                             })
                           }
-                          className="text-xs font-bold text-blue-600 hover:text-blue-800 cursor-pointer"
+                          className="text-xs font-bold text-purple-600 hover:text-purple-800 cursor-pointer"
                         >
                           {selectedCaseDetail.feedback ? '피드백 수정' : '+ 평가 등록'}
                         </button>
@@ -1512,10 +1512,10 @@ export default function App() {
         {activeTab === 'laws' && (
           <div className="flex flex-col gap-6">
             {/* 상단 안내 배너 + 자동 업데이트 현황 */}
-            <div className="bg-blue-50/80 border-l-4 border-blue-600 p-4 rounded-r-md flex flex-wrap items-center justify-between gap-3">
+            <div className="bg-purple-50/80 border-l-4 border-purple-600 p-4 rounded-r-md flex flex-wrap items-center justify-between gap-3">
               <div>
                 <div className="flex items-center gap-2 text-sm font-bold text-slate-900">
-                  <Info className="w-4.5 h-4.5 text-blue-600" />
+                  <Info className="w-4.5 h-4.5 text-purple-600" />
                   <span>
                     국가법령정보센터 및 인사혁신처 고시 연계 자동 업데이트 지원
                   </span>
@@ -1529,7 +1529,7 @@ export default function App() {
                 <button
                   type="button"
                   onClick={() => setShowAutoUpdateDrawer(true)}
-                  className="px-3.5 py-1.5 text-xs font-bold text-blue-700 bg-white border border-blue-200 hover:bg-blue-50 rounded-md inline-flex items-center gap-1.5 cursor-pointer whitespace-nowrap"
+                  className="px-3.5 py-1.5 text-xs font-bold text-purple-700 bg-white border border-purple-200 hover:bg-purple-50 rounded-md inline-flex items-center gap-1.5 cursor-pointer whitespace-nowrap"
                 >
                   <RefreshCw className="w-3.5 h-3.5" />
                   개정 확인 설정
@@ -1566,8 +1566,8 @@ export default function App() {
                 onClick={() => pdfFileInputRef.current?.click()}
                 className={`border-2 border-dashed rounded-lg p-7 text-center transition-colors cursor-pointer ${
                   isDraggingPdf
-                    ? 'border-blue-600 bg-blue-50/60'
-                    : 'border-slate-300 bg-slate-50/60 hover:border-blue-500'
+                    ? 'border-purple-600 bg-purple-50/60'
+                    : 'border-slate-300 bg-slate-50/60 hover:border-purple-500'
                 }`}
               >
                 <input
@@ -1582,14 +1582,14 @@ export default function App() {
                 />
                 {isExtractingPdf ? (
                   <div className="flex flex-col items-center">
-                    <Loader2 className="w-8 h-8 text-blue-600 animate-spin mb-2" />
+                    <Loader2 className="w-8 h-8 text-purple-600 animate-spin mb-2" />
                     <p className="text-sm font-semibold text-slate-800">
                       {pdfProgressText}
                     </p>
                   </div>
                 ) : (
                   <div className="flex flex-col items-center">
-                    <Upload className="w-8 h-8 text-blue-600 mb-2" />
+                    <Upload className="w-8 h-8 text-purple-600 mb-2" />
                     <p className="text-sm font-semibold text-slate-800">
                       법령 PDF 파일을 이곳에 드래그하거나 클릭하여 파일을 선택하세요
                     </p>
@@ -1597,7 +1597,7 @@ export default function App() {
                       PDF(.pdf)만 허용 · 업로드 즉시 조문 텍스트 자동 추출
                     </p>
                     {pdfProgressText && (
-                      <p className="mt-2 text-xs font-semibold text-blue-700">
+                      <p className="mt-2 text-xs font-semibold text-purple-700">
                         {pdfProgressText}
                       </p>
                     )}
@@ -1616,7 +1616,7 @@ export default function App() {
                     value={lawTitleInput}
                     onChange={(e) => setLawTitleInput(e.target.value)}
                     placeholder="예: 공무원 징계령, 국가공무원 복무규정"
-                    className="w-full h-10 px-3 text-sm bg-white border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-600"
+                    className="w-full h-10 px-3 text-sm bg-white border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-600"
                   />
                 </div>
                 <div className="sm:col-span-3">
@@ -1624,7 +1624,7 @@ export default function App() {
                     type="button"
                     disabled={isExtractingPdf}
                     onClick={handleRegisterLaw}
-                    className="w-full h-10 px-4 text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 rounded-md transition-colors cursor-pointer"
+                    className="w-full h-10 px-4 text-sm font-bold text-white bg-purple-600 hover:bg-purple-700 disabled:bg-purple-400 rounded-md transition-colors cursor-pointer"
                   >
                     등록
                   </button>
@@ -1666,7 +1666,7 @@ export default function App() {
                               setLawPreviewSearch('');
                             }}
                             className={`cursor-pointer transition-colors ${
-                              isSelected ? 'bg-blue-50/70' : 'hover:bg-slate-50'
+                              isSelected ? 'bg-purple-50/70' : 'hover:bg-slate-50'
                             }`}
                           >
                             <td className="py-3.5 px-4">
@@ -1684,7 +1684,7 @@ export default function App() {
                                 {law.fileName} · 시행 {law.updatedAt.slice(0, 10)}
                               </div>
                             </td>
-                            <td className="py-3.5 px-4 font-mono text-xs text-blue-700 font-bold whitespace-nowrap">
+                            <td className="py-3.5 px-4 font-mono text-xs text-purple-700 font-bold whitespace-nowrap">
                               {law.currentVersion}
                             </td>
                             <td
@@ -1738,7 +1738,7 @@ export default function App() {
                   <div className="w-full h-2 bg-slate-200 rounded-full overflow-hidden">
                     <div
                       className={`h-full transition-all ${
-                        storageStats.percent > 80 ? 'bg-red-600' : 'bg-blue-600'
+                        storageStats.percent > 80 ? 'bg-red-600' : 'bg-purple-600'
                       }`}
                       style={{ width: `${Math.max(2, storageStats.percent)}%` }}
                     />
@@ -1766,7 +1766,7 @@ export default function App() {
                       <button
                         type="button"
                         onClick={() => setLawForDiffModal(selectedLawForPreview)}
-                        className="px-2.5 py-1 text-xs font-semibold text-blue-700 bg-blue-50 hover:bg-blue-100 rounded inline-flex items-center gap-1 cursor-pointer"
+                        className="px-2.5 py-1 text-xs font-semibold text-purple-700 bg-purple-50 hover:bg-purple-100 rounded inline-flex items-center gap-1 cursor-pointer"
                       >
                         <History className="w-3.5 h-3.5" />
                         개정 이력 Diff
@@ -1779,7 +1779,7 @@ export default function App() {
                         value={lawPreviewSearch}
                         onChange={(e) => setLawPreviewSearch(e.target.value)}
                         placeholder="이 법령 본문 내 조문 번호나 단어 검색 (예: 제31조, 육아휴직)"
-                        className="w-full h-9 pl-8 pr-3 text-xs bg-slate-50 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-600"
+                        className="w-full h-9 pl-8 pr-3 text-xs bg-slate-50 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-600"
                       />
                       <Search className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-2.5" />
                     </div>
@@ -1946,7 +1946,7 @@ export default function App() {
                     URL.revokeObjectURL(url);
                     showToast('HTML 파일이 다운로드되었습니다.', 'success');
                   }}
-                  className="px-3.5 py-1.5 text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 rounded cursor-pointer inline-flex items-center gap-1"
+                  className="px-3.5 py-1.5 text-xs font-bold text-white bg-purple-600 hover:bg-purple-700 rounded cursor-pointer inline-flex items-center gap-1"
                 >
                   <Download className="w-3.5 h-3.5" />
                   .html 파일 다운로드

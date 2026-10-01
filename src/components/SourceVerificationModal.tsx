@@ -69,7 +69,7 @@ export const SourceVerificationModal: React.FC<SourceVerificationModalProps> = (
         {/* 상단 헤더 */}
         <div className="flex flex-wrap items-center justify-between gap-3 pb-4 mb-4 border-b border-slate-100">
           <div>
-            <div className="flex items-center gap-2 text-xs font-semibold text-blue-700">
+            <div className="flex items-center gap-2 text-xs font-semibold text-purple-700">
               <BookOpen className="w-4 h-4" />
               <span>법령 원문 대조 검증</span>
               <span className="text-slate-300">·</span>
@@ -96,7 +96,7 @@ export const SourceVerificationModal: React.FC<SourceVerificationModalProps> = (
                 href={law.sourceUrl}
                 target="_blank"
                 rel="noreferrer noopener"
-                className="px-3 py-1.5 text-xs font-semibold text-blue-700 bg-blue-50 hover:bg-blue-100 rounded-md inline-flex items-center gap-1.5 transition-colors"
+                className="px-3 py-1.5 text-xs font-semibold text-purple-700 bg-purple-50 hover:bg-purple-100 rounded-md inline-flex items-center gap-1.5 transition-colors"
               >
                 <ExternalLink className="w-3.5 h-3.5" />
                 국가법령센터 원문
@@ -131,7 +131,7 @@ export const SourceVerificationModal: React.FC<SourceVerificationModalProps> = (
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             placeholder="법령 본문 내 조문 번호나 키워드 검색 (예: 제31조, 육아휴직)"
-            className="w-full h-9 pl-9 pr-3 text-xs bg-slate-50 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-600"
+            className="w-full h-9 pl-9 pr-3 text-xs bg-slate-50 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-600"
           />
           <Search className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
         </div>

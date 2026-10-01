@@ -95,7 +95,7 @@ export const VersionDiffModal: React.FC<VersionDiffModalProps> = ({
         {/* 상단 헤더 */}
         <div className="flex flex-wrap items-center justify-between gap-3 pb-4 mb-4 border-b border-slate-100">
           <div>
-            <div className="flex items-center gap-2 text-xs font-semibold text-blue-700">
+            <div className="flex items-center gap-2 text-xs font-semibold text-purple-700">
               <History className="w-4 h-4" />
               <span>법령 개정 이력 및 버전 비교 (Version Control Diff)</span>
             </div>
@@ -112,7 +112,7 @@ export const VersionDiffModal: React.FC<VersionDiffModalProps> = ({
                   onApplyPendingUpdate(law.id);
                   onClose();
                 }}
-                className="px-3.5 py-1.5 text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 rounded-md transition-colors cursor-pointer"
+                className="px-3.5 py-1.5 text-xs font-bold text-white bg-purple-600 hover:bg-purple-700 rounded-md transition-colors cursor-pointer"
               >
                 신규 개정안 즉시 적용
               </button>
@@ -196,7 +196,7 @@ export const VersionDiffModal: React.FC<VersionDiffModalProps> = ({
                   type="button"
                   onClick={() => setFilterClause(clause)}
                   className={`px-2 py-0.5 rounded text-[11px] font-medium transition-colors cursor-pointer ${
-                    filterClause === clause ? 'bg-blue-600 text-white' : 'bg-blue-50 text-blue-700 hover:bg-blue-100'
+                    filterClause === clause ? 'bg-purple-600 text-white' : 'bg-purple-50 text-purple-700 hover:bg-purple-100'
                   }`}
                 >
                   {clause}

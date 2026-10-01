@@ -81,7 +81,7 @@ export const FeedbackModal: React.FC<FeedbackModalProps> = ({
         {/* 상단 헤더 */}
         <div className="flex items-center justify-between pb-3 mb-4 border-b border-slate-100">
           <div className="flex items-center gap-2">
-            <MessageSquarePlus className="w-5 h-5 text-blue-600" />
+            <MessageSquarePlus className="w-5 h-5 text-purple-600" />
             <h2 className="text-base font-bold text-slate-900">
               AI 답변 정확도 평가 및 피드백
             </h2>
@@ -151,7 +151,7 @@ export const FeedbackModal: React.FC<FeedbackModalProps> = ({
                     onClick={() => toggleTag(tag)}
                     className={`px-2.5 py-1 text-xs rounded-md border font-medium transition-colors cursor-pointer ${
                       isSelected
-                        ? 'bg-blue-50 border-blue-300 text-blue-700 font-semibold'
+                        ? 'bg-purple-50 border-purple-300 text-purple-700 font-semibold'
                         : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50'
                     }`}
                   >
@@ -177,7 +177,7 @@ export const FeedbackModal: React.FC<FeedbackModalProps> = ({
               value={comment}
               onChange={(e) => setComment(e.target.value)}
               placeholder="예: 근거 조문 인용이 정확하여 실무 결재 시 바로 인용 가능함. 단, 부칙 경과규정 적용 대상 여부에 대한 추가 언급이 있으면 더 좋겠습니다."
-              className="w-full p-3 text-xs bg-white border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-600 leading-relaxed"
+              className="w-full p-3 text-xs bg-white border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-600 leading-relaxed"
             />
           </div>
 
@@ -194,7 +194,7 @@ export const FeedbackModal: React.FC<FeedbackModalProps> = ({
               type="text"
               value={reviewer}
               onChange={(e) => setReviewer(e.target.value)}
-              className="w-full h-9 px-3 text-xs bg-white border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-600"
+              className="w-full h-9 px-3 text-xs bg-white border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-600"
             />
           </div>
 
@@ -208,7 +208,7 @@ export const FeedbackModal: React.FC<FeedbackModalProps> = ({
             </button>
             <button
               type="submit"
-              className="px-4 py-2 text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 rounded-md transition-colors cursor-pointer"
+              className="px-4 py-2 text-xs font-bold text-white bg-purple-600 hover:bg-purple-700 rounded-md transition-colors cursor-pointer"
             >
               피드백 등록 완료
             </button>

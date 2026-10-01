@@ -57,7 +57,7 @@ export const AutoUpdateDrawer: React.FC<AutoUpdateDrawerProps> = ({
         {/* 상단 헤더 */}
         <div className="flex items-center justify-between pb-3 mb-4 border-b border-slate-100">
           <div>
-            <div className="flex items-center gap-2 text-xs font-semibold text-blue-700">
+            <div className="flex items-center gap-2 text-xs font-semibold text-purple-700">
               <RefreshCw className="w-4 h-4" />
               <span>자동 법령 업데이트 및 공공 법령 피드 연계 관리</span>
             </div>
@@ -80,7 +80,7 @@ export const AutoUpdateDrawer: React.FC<AutoUpdateDrawerProps> = ({
           <div className="p-4 bg-slate-50 border border-slate-200 rounded-md">
             <div className="flex flex-wrap items-center justify-between gap-3 mb-3">
               <div className="flex items-center gap-2">
-                <Sliders className="w-4 h-4 text-blue-600" />
+                <Sliders className="w-4 h-4 text-purple-600" />
                 <span className="text-xs font-bold text-slate-800">
                   자동 업데이트 주기 및 백그라운드 확인 설정
                 </span>
@@ -97,7 +97,7 @@ export const AutoUpdateDrawer: React.FC<AutoUpdateDrawerProps> = ({
                   }
                   className="sr-only peer"
                 />
-                <div className="w-9 h-5 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-blue-600"></div>
+                <div className="w-9 h-5 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-purple-600"></div>
                 <span className="ml-2 text-xs font-semibold text-slate-700">
                   {data.autoUpdateSettings.enabled ? '자동 점검 활성화' : '수동 점검만 사용'}
                 </span>
@@ -137,7 +137,7 @@ export const AutoUpdateDrawer: React.FC<AutoUpdateDrawerProps> = ({
                     type="button"
                     disabled={isChecking}
                     onClick={handleManualCheck}
-                    className="text-xs font-semibold text-blue-600 hover:text-blue-800 disabled:text-slate-400 inline-flex items-center gap-1 cursor-pointer"
+                    className="text-xs font-semibold text-purple-600 hover:text-purple-800 disabled:text-slate-400 inline-flex items-center gap-1 cursor-pointer"
                   >
                     {isChecking ? (
                       <>
@@ -225,7 +225,7 @@ export const AutoUpdateDrawer: React.FC<AutoUpdateDrawerProps> = ({
                             onApplyUpdate(law.id);
                             onClose();
                           }}
-                          className="px-3 py-1.5 text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 rounded inline-flex items-center gap-1 cursor-pointer"
+                          className="px-3 py-1.5 text-xs font-bold text-white bg-purple-600 hover:bg-purple-700 rounded inline-flex items-center gap-1 cursor-pointer"
                         >
                           <Sparkles className="w-3.5 h-3.5" />
                           개정안 적용하기
